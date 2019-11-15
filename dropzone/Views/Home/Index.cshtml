@@ -1,0 +1,75 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<link href="~/Content/dist/basic.css" rel="stylesheet" />
+<link href="~/Content/dist/dropzone.css" rel="stylesheet" />
+<script src="~/Content/dropzone.default.js"></script>
+<script src="~/Content/dropzone.js"></script>
+
+<script type="text/javascript">
+    // Dropzone的初始化，myDropzone图片div的id（图片上传）
+    Dropzone.options.mDropzoneOne = {
+        maxFilesize: 5, // MB
+        maxFiles: 1, // 单文件上传  maxFiles 和  parallelUploads 都必须设置为 1
+        parallelUploads: 1,
+        addRemoveLinks: true,
+        params: function (files, xhr) {
+            if (!files.length) {
+                return false;
+            }
+            var file = files[0];
+            return {
+                fileName: file.name,
+                fileType: file.type,
+            }
+        },
+        init: function () {
+            var dropzoneInstance = this;
+            if ($("#Avatar").val()) {
+                var mockFile = { dataURL: $("#Avatar").val() };    // 将图片地址赋值给控件（用于展示已上传的图片）
+                dropzoneInstance.createThumbnailFromUrl(mockFile, dropzoneInstance.options.thumbnailWidth, dropzoneInstance.options.thumbnailHeight, dropzoneInstance.options.thumbnailMethod, true, function (thumbnail, canvas) {
+                    var file = Dropzone.dataURItoBlob(thumbnail);
+                    file.name = "123.png";
+                    file.lastModifiedDate = Date.now;
+                    dropzoneInstance.emit("addedfile", file);
+                    dropzoneInstance.files.push(file);
+                    dropzoneInstance.emit("thumbnail", file, thumbnail);
+                    dropzoneInstance.emit("complete", file);
+                })
+            }
+
+            this.on("success", function (file, response) {
+                if (response.success) { // 图片上传成功后将地址写入input框（用于上传图片）
+                    $("#Avatar").val(response.message);
+                }
+            });
+
+            this.on("addedfile", function (file) {
+                if (dropzoneInstance.options.maxFiles == 1 && dropzoneInstance.options.parallelUploads == 1) {
+                    var exitFiles = without(dropzoneInstance.files, file)
+                    $.each(exitFiles, function (index, item) {
+                        dropzoneInstance.removeFile(item);
+                    })
+                }
+            })
+            this.on("removedfile", function (file) {
+                debugger;
+                $("#PictureId").val("")
+            })
+        }
+    }
+</script>
+
+<div class="row" style="margin-top:50px;">
+        <div class="col-md-4 form-group m-form__group row">
+            <label asp-for="Avatar" class="col-form-label col-md-3"> 上传账号 </label>
+            <div class="col-md-9">
+                @*<input id="Avatar" type="hidden" />*@
+                <input id="PictureFileToken" type="hidden" />
+                <input id="PictureId" type="hidden" />
+                <div class="dropzone m-dropzone m-dropzone--success" id="m-dropzone-one" action="/Home/UpLoadProcess">
+                </div>
+            </div>
+        </div>
+</div>
+<input type="text"  id="Avatar" readonly/>

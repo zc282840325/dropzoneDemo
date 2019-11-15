@@ -5,6 +5,7 @@ dropzone简单学习
 ![](https://github.com/zc282840325/dropzoneDemo/blob/master/dropzone/Resource/2.png)
 
 ## html部分
+
 <div class="row" style="margin-top:50px;">
         <div class="col-md-4 form-group m-form__group row">
             <label asp-for="Avatar" class="col-form-label col-md-3"> 上传账号 </label>
